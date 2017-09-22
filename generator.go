@@ -310,8 +310,10 @@ func (g *generator) runNotifyCmd(config Config) {
 	}
 
 	log.Printf("Running '%s'", config.NotifyCmd)
-	cmd := exec.Command("/bin/sh", "-c", config.NotifyCmd)
+	// cmd := exec.Command("/bin/sh", "-c", config.NotifyCmd)
+	cmd := exec.Command("Powershell", "-Command", config.NotifyCmd)
 	out, err := cmd.CombinedOutput()
+	log.Printf("[Run Script]\n%s\n", out)
 	if err != nil {
 		log.Printf("Error running notify command: %s, %s\n", config.NotifyCmd, err)
 	}

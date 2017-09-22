@@ -16,7 +16,6 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
-	"syscall"
 	"text/template"
 )
 
@@ -509,13 +508,13 @@ func GenerateFile(config Config, containers Context) bool {
 		}
 
 		oldContents := []byte{}
-		if fi, err := os.Stat(config.Dest); err == nil {
-			if err := dest.Chmod(fi.Mode()); err != nil {
-				log.Fatalf("Unable to chmod temp file: %s\n", err)
-			}
-			if err := dest.Chown(int(fi.Sys().(*syscall.Stat_t).Uid), int(fi.Sys().(*syscall.Stat_t).Gid)); err != nil {
-				log.Fatalf("Unable to chown temp file: %s\n", err)
-			}
+		if _, err := os.Stat(config.Dest); err == nil {
+			//if err := dest.Chmod(fi.Mode()); err != nil {
+			//	log.Fatalf("Unable to chmod temp file: %s\n", err)
+			//}
+			// if err := dest.Chown(int(fi.Sys().(*syscall.Stat_t).Uid), int(fi.Sys().(*syscall.Stat_t).Gid)); err != nil {
+			// 	log.Fatalf("Unable to chown temp file: %s\n", err)
+			// }
 			oldContents, err = ioutil.ReadFile(config.Dest)
 			if err != nil {
 				log.Fatalf("Unable to compare current file contents: %s: %s\n", config.Dest, err)
@@ -523,6 +522,7 @@ func GenerateFile(config Config, containers Context) bool {
 		}
 
 		if bytes.Compare(oldContents, contents) != 0 {
+			dest.Close()
 			err = os.Rename(dest.Name(), config.Dest)
 			if err != nil {
 				log.Fatalf("Unable to create dest file %s: %s\n", config.Dest, err)
